@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title><%= kitapAdi %></title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #FFC0CB;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            max-width: 800px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            text-align: justify;
+            line-height: 1.5;
+            overflow: auto;
+            max-height: 80vh;
+            white-space: pre-line;
+            transition: all 0.5s;
+            margin-bottom: 20px;
+            margin-top: 20px;
+            z-index: 1;
+        }
+
+        .container-name {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+
+        .book-page {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .magnifier-icon {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 20px;
+            cursor: pointer;
+            z-index: 3;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2;
+        }
+
+        .loading-text {
+            color: white;
+            font-size: 20px;
+            animation: pulse 1.5s infinite;
+        }
+
+        .comments-container {
+            position: fixed;
+            bottom: 60px; /* Sayfanın altında biraz daha yukarıda bir mesafe bırakmak için istediğiniz değeri ayarlayın */
+            right: 20px;  /* Sayfanın sağında bir mesafe bırakmak için istediğiniz değeri ayarlayın */
+            z-index: 2;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            display: none;
+        }
+
+        .comments-container h2 {
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 18px;
+        }
+
+        .comments-container ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .comments-container li {
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+
+        .comments-container form {
+            display: flex;
+            flex-direction: column;
+            margin-top: 20px;
+        }
+
+        .comments-container label {
+            margin-bottom: 5px;
+        }
+
+        .comments-container textarea {
+            resize: vertical;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+
+        .comments-container button {
+            align-self: flex-end;
+            cursor: pointer;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .comments-container button:hover {
+            background-color: #45a049;
+        }
+
+        .comments-btn {
+            position: fixed;
+            bottom: 20px; /* Sayfanın altında bir mesafe bırakmak için istediğiniz değeri ayarlayın */
+            right: 20px; /* Sayfanın sağında bir mesafe bırakmak için istediğiniz değeri ayarlayın */
+            z-index: 2;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px;
+        }
+
+        .comments-btn:hover {
+            background-color: #45a049;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+</head>
+<body>
+    <div class="container">
+        <div class="container-name"><%= kitapAdi %></div>
+        <div class="book-page" id="page1"><%= kitapYazi %></div>
+        <div class="magnifier-icon" onclick="toggleOverlay()">🔍</div>
+    </div>
+
+    <div class="comments-container" id="commentsContainer">
+        <h2>Yorumlar</h2>
+        <ul>
+            <% yorumlar.forEach(function(yorum) { %>
+                <li>
+                    <strong><%= yorum.isim %>:</strong> <%= yorum.yorum %>
+                </li>
+            <% }); %>
+        </ul>
+
+        <!-- Yorum ekleme formu -->
+        <form action="/yorum-ekle" method="post">
+            <label for="yorum">Yorumunuzu buraya ekleyin:</label>
+            <textarea name="yorum" rows="4" required></textarea>
+            <input type="hidden" name="kitapAdi" value="<%= kitapAdi %>">
+            <input type="hidden" name="isim" value="<%= kullaniciAdi %>">
+            <button type="submit">Yorum Ekle</button>
+        </form>
+    </div>
+
+    <div class="overlay" id="overlay" onclick="hideOverlay()">
+        <div class="loading-text">Yükleniyor...</div>
+    </div>
+
+    <div class="comments-btn" onclick="toggleComments()">Yorumlar</div>
+
+    <script>
+        function hideOverlay() {
+            const overlay = document.getElementById("overlay");
+            overlay.style.display = "none";
+        }
+
+        function toggleOverlay() {
+            const overlay = document.getElementById("overlay");
+            overlay.style.display = overlay.style.display === "flex" ? "none" : "flex";
+            const container = document.querySelector(".container");
+            container.style.zIndex = overlay.style.display === "flex" ? "3" : "1";
+        }
+
+        function toggleComments() {
+            const commentsContainer = document.getElementById("commentsContainer");
+            commentsContainer.style.display = commentsContainer.style.display === "block" ? "none" : "block";
+        }
+    </script>
+</body>
+</html>

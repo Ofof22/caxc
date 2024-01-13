@@ -1,0 +1,96 @@
+                <!-- views/panel.ejs -->
+
+                <!DOCTYPE html>
+                <html lang="en">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <style>
+                        body {
+                            font-family: Arial, sans-serif;
+                            margin: 20px;
+                        }
+
+                        h1 {
+                            color: #333;
+                        }
+
+                        h2 {
+                            color: #555;
+                        }
+
+                        div {
+                            margin-bottom: 30px;
+                        }
+
+                        ul {
+                            list-style-type: none;
+                            padding: 0;
+                        }
+
+                        li {
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: center;
+                            border-bottom: 1px solid #ddd;
+                            padding: 10px;
+                            margin-bottom: 5px;
+                        }
+
+                        form {
+                            display: inline-block;
+                        }
+
+                        button {
+                            background-color: #e74c3c;
+                            color: #fff;
+                            border: none;
+                            padding: 8px 12px;
+                            cursor: pointer;
+                            font-size: 14px;
+                        }
+
+                        button:hover {
+                            background-color: #c0392b;
+                        }
+                    </style>
+                    <title>Panel</title>
+                </head>
+                <body>
+                    <h1>Panel</h1>
+                    <div>
+                        <h2>Üyeler</h2>
+                        <ul>
+                          <% for (const user of users) { %>
+                            <li>
+                              <%= user.kullaniciAdi %> - <%= user.sifre %>
+                              <form action="/deleteUser" method="POST">
+                                <!-- Kullanıcı adı ve şifreyi ayrı ayrı gönder -->
+                                <input type="hidden" name="kullaniciAdi" value="<%= user.kullaniciAdi %>">
+                                <input type="hidden" name="sifre" value="<%= user.sifre %>">
+                                <button type="submit">🗑️</button>
+                              </form>
+                            </li>
+                          <% } %>
+                        </ul>
+
+
+                    </div>
+                    <div>
+                        <h2>Kitaplar</h2>
+                        <ul>
+                            <% for (const kitap of kitaplar) { %>
+                                <li>
+                                    <%= kitap.kitapAdi %>
+                                    <form action="/deleteKitap" method="POST">
+                                        <!-- Kitap adını "kitapAdi" olarak gönder -->
+                                        <input type="hidden" name="kitapAdi" value="<%= kitap.kitapAdi %>">
+                                        <button type="submit">🗑️</button>
+                                    </form>
+                                </li>
+                            <% } %>
+                        </ul>
+                    </div>
+                </body>
+                </html>

@@ -1,0 +1,73 @@
+            <!-- profil.ejs -->
+
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+                <meta charset="UTF-8">
+                <meta http-equiv="X-UA-Compatible" content="IE=edge">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <link rel="stylesheet" href="/style.css">
+                <style>
+                    body {
+                        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                        background-color: #2c3e50;
+                        margin: 0;
+                        padding: 0;
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        justify-content: center;
+                        height: 100vh;
+                        color: #ecf0f1;
+                    }
+
+                    h1 {
+                        color: #3498db;
+                        font-size: 3em;
+                        margin-bottom: 20px;
+                    }
+
+                    .profile-info {
+                        margin-bottom: 20px;
+                        border-bottom: 2px solid #3498db;
+                        padding-bottom: 10px;
+                        text-align: center;
+                    }
+
+                    .profile-info p {
+                        font-size: 1.2em;
+                        margin: 10px 0;
+                    }
+
+                    .books-list {
+                        margin-top: 20px;
+                        font-size: 1.2em;
+                        color: #e0e0e0;
+                        text-align: center;
+                    }
+
+                    .books-list p {
+                        margin: 10px 0;
+                    }
+                </style>
+                <title>Profil</title>
+            </head>
+            <body>
+
+                <h1>Profil</h1>
+
+                <div class="profile-info">
+                    <p><strong>Kullanıcı Adı:</strong> <%= kullanici.kullaniciAdi %></p>
+                    <p><strong>Rolü:</strong> <%= rolAdiGetir(kullanici.perm) %></p>
+                </div>
+
+                <div class="books-list">
+                    <% if (kullanici.perm > 0) { %>
+                        <p><strong>Yazdığı Kitaplar:</strong> Yakında!</p>
+                    <% } else { %>
+                        <p><strong>Kitaplar:</strong> Yakında!</p>
+                    <% } %>
+                </div>
+
+            </body>
+            </html>

@@ -1,0 +1,163 @@
+<!-- panel.ejs -->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hoş Geldiniz</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            font-family: 'Arial', sans-serif;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #3498db;
+        }
+
+        .hosgeldin-mesaji {
+            font-size: 24px;
+            color: #3498db;
+            margin-top: 20px;
+        }
+
+        .cikis-yap {
+            margin-top: 20px;
+        }
+
+        .kitap-form {
+            margin-top: 20px;
+            background-color: #3498db;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .kitap-form h2 {
+            color: #ecf0f1;
+        }
+
+        .form-group label {
+            color: #ecf0f1;
+        }
+
+        .form-control {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            border: 1px solid #3498db;
+        }
+
+        .btn-primary {
+            background-color: #ecf0f1;
+            color: #3498db;
+            border: 1px solid #3498db;
+        }
+
+        .btn-primary:hover {
+            background-color: #2980b9;
+            border: 1px solid #2980b9;
+        }
+
+        .custom-textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            resize: vertical;
+        }
+
+        .video-container {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            max-width: 300px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="video-container">
+                    <iframe width="300" height="200" src="https://www.youtube.com/embed/XX_FU-ZQ6Dg" frameborder="0" allowfullscreen></iframe>
+                </div>
+                <h1 class="text-center">Hoş Geldiniz</h1>
+                <% if (typeof kullaniciAdi !== 'undefined') { %>
+                <p class="hosgeldin-mesaji text-center">Hoş geldin, <%= kullaniciAdi %>!</p>
+                <% } else { %>
+                <p class="hosgeldin-mesaji text-center">Hoş geldin, Misafir!</p>
+                <% } %>
+                    <p class="hosgeldin-mesaji text-center">Merhaba!, Burda kitabı nasıl paylaşcagınız şeklinde bir dosya hazırladım bunu okursanız net bir şekilde paylaşabilirsiniz.</p>
+                    <a href="/oku" class="btn btn-primary">Nasıl paylaşcagını ogren</a>
+                   
+                <form action="/cikis" method="POST" class="cikis-yap text-center">
+                    <button type="submit" class="btn btn-danger">Çıkış Yap</button>
+                </form>
+                <div class="kitap-form">
+                    <h2>Yeni Kitap Ekle</h2>
+                    <form action="/kitap-ekle" method="POST">
+                        <div class="form-group">
+                            <label for="kitapAdi">Kitap İsmi:</label>
+                            <input type="text" class="form-control" id="kitapAdi" name="kitapAdi" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="kitapYazari">Kitap Yazarı:</label>
+                            <input type="text" class="form-control" id="kitapYazari" name="kitapYazari" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="kitapFoto">Kitap Fotoğrafı (Link):</label>
+                            <input type="text" class="form-control" id="kitapFoto" name="kitapFoto" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="kitapKonusu">Kitap Konusu:</label>
+                            <input type="text" class="form-control" id="kitapKonusu" name="kitapKonusu" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="kitapYazisi">Kitap Yazısı:</label>
+                            <textarea class="custom-textarea" id="kitapYazisi" name="kitapYazisi" rows="5" required></textarea>
+                        </div>
+                        
+
+                        <button type="submit" class="btn btn-primary">Kitap Ekle</button>
+                        <% if (typeof kitapKodu !== 'undefined') { %>
+                            <div class="modal" id="kitapEklendiModal" tabindex="-1" role="dialog">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">Kitap Eklendi</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <p>Kitabınız başarıyla derlendi: Kod: <%= kitapKodu %> ile kitabınızı düzenleyebilir veya başka işlemler yapabilirsiniz.</p>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <a href="/kitaplar" class="btn btn-success">Tamam</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Modal penceresini otomatik olarak göster -->
+                            <script>
+                                document.addEventListener('DOMContentLoaded', function () {
+                                    $('#kitapEklendiModal').modal('show');
+                                });
+                            </script>
+                        <% } %>
+                    </form>
+                </div>
+                <!-- Diğer içerikleri buraya ekleyebilirsiniz -->
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

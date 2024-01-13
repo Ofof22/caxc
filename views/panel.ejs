@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hoş Geldiniz</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            font-family: 'Arial', sans-serif;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #3498db;
+        }
+
+        .hosgeldin-mesaji {
+            font-size: 24px;
+            color: #3498db;
+            margin-top: 20px;
+        }
+
+        .cikis-yap {
+            margin-top: 20px;
+        }
+
+        .video-container {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            max-width: 300px;
+        }
+
+        .duyuru-listesi {
+            background-color: #3498db;
+            color: #fff;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+
+        .duyuru-listesi ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .duyuru-listesi li {
+            margin-bottom: 10px;
+        }
+        /* Düğmelerin genel stil ayarları */
+        .btn {
+            margin: 5px;
+            padding: 8px 12px; /* Düğme iç içe içerik boşluğunu ayarla */
+            border-radius: 8px; /* Düğme kenarlarını yuvarla */
+            font-weight: bold; /* Metin kalınlığını artır */
+            font-size: 14px; /* Metin boyutunu ayarla */
+        }
+
+        /* Ana renk düğmeleri özelleştirme */
+        .btn-danger {
+            background-color: #e74c3c;
+            border-color: #c0392b;
+            color: #fff;
+        }
+
+        /* Ana renk düğmesi üzerine gelindiğindeki stil ayarları */
+        .btn-danger:hover {
+            background-color: #c0392b;
+            border-color: #a93226;
+            color: #fff;
+        }
+
+        /* Diğer düğmeleri özelleştirme */
+        .btn-secondary {
+            background-color: #34495e;
+            border-color: #2c3e50;
+            color: #fff;
+        }
+
+        /* Diğer düğme üzerine gelindiğindeki stil ayarları */
+        .btn-secondary:hover {
+            background-color: #2c3e50;
+            border-color: #233140;
+            color: #fff;
+        }
+
+        /* Metinleri yan yana düzenleme ve boşluk bırakma */
+        .cikis-yap a {
+            display: inline-block; /* Düğmelerin yan yana sıralanmasını sağla */
+            margin-right: 10px; /* Düğmeler arasında boşluk bırak */
+        }
+
+
+
+        /* Metinleri yan yana düzenleme */
+        .cikis-yap a {
+            display: inline-block; /* Düğmelerin yan yana sıralanmasını sağla */
+        }
+
+r: #fff;
+        }
+    </style>
+
+</head>
+
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <h1 class="text-center">Hoş Geldiniz</h1>
+                <% if (typeof kullaniciAdi !== 'undefined') { %>
+                <p class="hosgeldin-mesaji text-center">Hoş geldin, <%= kullaniciAdi %>!</p>
+                <% } else { %>
+                <p class="hosgeldin-mesaji text-center">Hoş geldin, Misafir!</p>
+                <% } %>
+                <form action="/cikis" method="POST" class="cikis-yap text-center d-flex justify-content-between">
+                    <button type="submit" class="btn btn-danger">Çıkış Yap</button>
+                    <a href="/paylas" class="btn btn-danger">Yazdıgın kitabını paylaş</a>
+                    <a href="/kitaplar" class="btn btn-danger">Telif hakları bizim tarafımızdan korunan kitaplara göz atmaya ne dersin</a>
+                </form>
+                <div class="duyuru-listesi">
+                    <h3>Duyurular</h3>
+                    <ul>
+                        <% for (let i = duyurular.length - 1; i >= 0; i--) { %>
+                            <li>
+                                <strong><%= duyurular[i].baslik %></strong>
+                                <p><%= duyurular[i].icerik %></p>
+                                <p>Tarih: <%= duyurular[i].tarih %></p>
+                            </li>
+                        <% } %>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,80 @@
+<!-- giris.ejs -->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Giriş Yap</title>
+    <link rel="stylesheet" href="/style.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1a1a1a;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            color: #fff;
+        }
+
+        h1 {
+            color: #ffcc00;
+            font-size: 3em;
+            margin-bottom: 20px;
+        }
+
+        .login-form {
+            width: 300px;
+            text-align: center;
+        }
+
+        label {
+            color: #3498db;
+            display: block;
+            margin: 10px 0;
+        }
+
+        input {
+            padding: 8px;
+            width: 100%;
+            box-sizing: border-box;
+            margin-bottom: 10px;
+        }
+
+        button {
+            background-color: #3498db;
+            color: #fff;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Giriş Yap</h1>
+
+    <div class="login-form">
+        <form action="/giris" method="POST">
+            <label for="kullaniciAdi">Kullanıcı Adı:</label>
+            <input type="text" id="kullaniciAdi" name="kullaniciAdi" required>
+
+            <label for="sifre">Şifre:</label>
+            <input type="password" id="sifre" name="sifre" required>
+
+            <button type="submit">Giriş Yap</button>
+        </form>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/style.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1a1a1a;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            color: #fff;
+        }
+
+        h1 {
+            color: #ffcc00;
+            font-size: 3em;
+            margin-bottom: 20px;
+        }
+
+        p {
+            margin: 10px 0;
+            font-size: 1.2em;
+            color: #e0e0e0;
+            text-align: center;
+        }
+
+        form {
+            background-color: #2c3e50;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            text-align: center;
+        }
+
+        label {
+            color: #3498db;
+            display: block;
+            margin: 10px 0;
+        }
+
+        input {
+            padding: 8px;
+            width: 100%;
+            box-sizing: border-box;
+            margin-bottom: 10px;
+            color: #6c5ce7;
+            border: none;
+            border-bottom: 2px solid #6c5ce7;
+            background-color: transparent;
+            transition: border-bottom-color 0.3s ease;
+        }
+
+        input::placeholder {
+            color: #6c5ce7;
+        }
+
+        input:focus {
+            border-bottom-color: #4834d4;
+            outline: none;
+        }
+
+        button {
+            background-color: #3498db;
+            color: #ecf0f1;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        .hata-mesaji {
+            color: #e74c3c;
+            margin-top: 10px;
+        }
+
+        a, button {
+            color: #ffcc00;
+            text-decoration: none;
+            font-weight: bold;
+            display: inline-block;
+            padding: 10px 20px;
+            margin-top: 10px;
+            border: 2px solid #ffcc00;
+            border-radius: 5px;
+            background-color: transparent;
+            transition: color 0.3s ease-in-out, background-color 0.3s ease-in-out;
+        }
+
+        a:hover, button:hover {
+            color: #1a1a1a;
+            background-color: #ffcc00;
+        }
+
+        .image-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin: auto;
+            overflow: hidden;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+            margin-bottom: 20px;
+        }
+
+        .image-container img {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 10px;
+        }
+    </style>
+    <title>Civa</title>
+</head>
+
+<body>
+
+    <div class="image-container">
+        <img src="https://cdn.discordapp.com/attachments/1168570835196461229/1185576614663290930/OIG_1.jpg?ex=65901d43&is=657da843&hm=65c870069e2d0496d139590b1373f8fadbd0bd6cb214d5e1ebc1f993181ff466&" alt="Civa Image">
+    </div>
+    <h1>Civa</h1>
+    <p>Merhaba! Civa, size en iyi hizmeti sunmak için burada.</p>
+
+    <a href="/giris">Oturum açmak için tıklayın</a>
+
+    <a href="/kayit">Hesap oluşturmak için tıklayın</a>
+    <p>Size en iyi kalite sunmaktan memnunuz</p>
+</body>
+
+</html>

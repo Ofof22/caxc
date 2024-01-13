@@ -1,0 +1,154 @@
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Kitaplar</title>
+
+      <style>
+          body {
+              font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+              background-color: #1a1a1a;
+              margin: 0;
+              padding: 0;
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              justify-content: center;
+              height: 100vh;
+              color: #fff;
+          }
+
+          h1 {
+              color: #ffcc00;
+              font-size: 3em;
+              margin-bottom: 20px;
+          }
+
+          .container {
+              display: flex;
+              flex-wrap: wrap;
+              justify-content: space-around;
+          }
+
+          .book {
+              width: 200px;
+              margin: 20px;
+              text-decoration: none;
+              color: #fff;
+              border: 2px solid #3498db;
+              border-radius: 10px;
+              overflow: hidden;
+              transition: transform 0.3s ease-in-out;
+          }
+
+          .book:hover {
+              transform: scale(1.05);
+          }
+
+          .book img {
+              width: 100%;
+              height: auto;
+              border-radius: 10px 10px 0 0;
+          }
+
+          .book-content {
+              padding: 10px;
+          }
+
+          .book-description {
+              display: none;
+              margin-top: 10px;
+              font-size: 0.8em;
+          }
+
+          .book:hover .book-description {
+              display: block;
+          }
+
+          .search-container {
+              margin-top: 20px;
+              text-align: center;
+          }
+
+          #search-input {
+              padding: 8px;
+              margin-right: 8px;
+              box-sizing: border-box;
+          }
+
+          .search-button {
+              background-color: #3498db;
+              color: #fff;
+              padding: 10px;
+              border: none;
+              border-radius: 5px;
+              cursor: pointer;
+          }
+
+          .search-button:hover {
+              background-color: #2980b9;
+          }
+
+          /* Ek stiller */
+          .author {
+              color: #3498db;
+              font-weight: bold;
+          }
+
+          .book-description p {
+              margin: 5px 0;
+              font-size: 0.8em;
+          }
+
+      </style>
+  </head>
+  <body>
+      <h1>Kitaplar</h1>
+
+      <div class="container" id="book-container">
+          <% kitaplar.forEach((kitap, index) => { %>
+          <!-- Kitap Listesi Buraya Eklenecek -->
+              <a href="/kitap/<%= kitap.kitapAdi %>" class="book">
+                  <img src="<%= kitap.kitapFoto %>" alt="<%= kitap.kitapAdi %>">
+                <div class="page-title"><%= kitap.kitapAdi %></div>
+                <div class="book-description">
+                  <p>Yazar: <%= kitap.kitapYazari %></p>
+                    
+                  <p>Açıklama: <%= kitap.kitapKonusu %></p>
+                </div>
+              </a>
+
+              <% if ((index + 1) % 4 === 0) { %>
+                <div class="clearfix"></div>
+              <% } %>
+            <% }); %>
+          <!-- Daha fazla kitap eklenebilir -->
+
+      </div>
+
+      <div class="search-container">
+          <input type="text" id="search-input" placeholder="Arama yap..." oninput="searchBooks()">
+          <button class="search-button" onclick="searchBooks()">Ara</button>
+      </div>
+
+      <script>
+          // (Arama fonksiyonu buraya eklenebilir)
+
+          function searchBooks() {
+              var searchInput = document.getElementById('search-input').value.toLowerCase();
+              var books = document.getElementsByClassName('book');
+
+              for (var i = 0; i < books.length; i++) {
+                  var bookTitle = books[i].querySelector('.page-title').innerText.toLowerCase();
+
+                  if (bookTitle.includes(searchInput)) {
+                      books[i].style.display = 'block';
+                  } else {
+                      books[i].style.display = 'none';
+                  }
+              }
+          }
+      </script>
+  </body>
+  </html>
