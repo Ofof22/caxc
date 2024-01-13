@@ -15,103 +15,92 @@ app.use(express.static("views"));
 // express-session ayarları
 app.use(
   session({
-    secret: "çokgizlianahtar", // Güvenli bir şekilde saklanmalıdır
+    secret: "gizlianahtar", // Güvenli bir şekilde saklanmalıdır
     resave: false,
     saveUninitialized: true,
   }),
 );
 
+
+const hesapJsonFilePath = 'hesap.json';
+
+// Kullanıcı bilgilerini okuma fonksiyonu
+function readUsersFromJson() {
+    try {
+        const hesapJsonData = fs.readFileSync(hesapJsonFilePath, 'utf8');
+        const users = JSON.parse(hesapJsonData).kullanicilar;
+        return users;
+    } catch (error) {
+        console.error('Hesap JSON dosyasını okuma hatası:', error.message);
+        return [];
+    }
+}
+
+// Kullanıcı bilgilerini yazma fonksiyonu
+function writeUsersToJson(users) {
+    try {
+        const data = JSON.stringify({ kullanicilar: users }, null, 2);
+        fs.writeFileSync(hesapJsonFilePath, data);
+    } catch (error) {
+        console.error('Hesap JSON dosyasını yazma hatası:', error.message);
+    }
+}
+
+app.post('/manageUser', (req, res) => {
+    const { kullaniciAdi, action, permission } = req.body;
+    const users = readUsersFromJson();
+    const userIndex = users.findIndex(u => u.kullaniciAdi === kullaniciAdi);
+
+    if (userIndex !== -1) {
+        if (action === 'delete') {
+            // Silme işlemi
+            users.splice(userIndex, 1);
+        } else if (action === 'update') {
+            // Güncelleme işlemi
+            users[userIndex].perm = parseInt(permission);
+        }
+
+        // Kullanıcı bilgilerini güncellenmiş haliyle dosyaya yaz
+        writeUsersToJson(users);
+
+        res.redirect('/adminpanel');
+    } else {
+        res.status(404).send('Kullanıcı bulunamadı');
+    }
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // Kitaplar metin dosyasından yükleniyor
 
 const kitapDosya = "kitap.json";
-const kitaplar = JSON.parse(fs.readFileSync(kitapDosya, "utf-8"));
+
+try {
+  const kitaplar = fs.readFileSync(kitapDosya, "utf-8");
+} catch (error) {
+  console.error("Dosya okuma hatası:", error.message);
+}
 // Ana sayfa
 app.get("/", (req, res) => {
   res.render("index");
-});
-app.get("/yaz", (req, res) => {
-  // kitap.json dosyasını oku
-  fs.readFile("kitap.json", "utf8", (err, data) => {
-    if (err) {
-      console.error("Dosya Okuma Hatası:", err);
-      res.status(500).json({ error: "Internal Server Error" });
-      return;
-    }
-
-    try {
-      // JSON formatındaki veriyi JavaScript nesnesine çevir
-      const kitapData = JSON.parse(data);
-
-      // Örneğin, ilk kitap bilgilerini al
-      const kitapInfo = {
-        kod: kitapData[0].kod,
-        kitapYazisi: kitapData[0].kitapYazisi,
-      };
-
-      // Yaz sayfasını render ederken kitapInfo'yu kullan
-      res.render("yaz.ejs", { kitapInfo });
-    } catch (parseError) {
-      console.error("JSON Parse Hatası:", parseError);
-      res.status(500).json({ error: "Internal Server Error" });
-    }
-  });
-});
-app.get("/applyChanges/:kod", (req, res) => {
-  const kod = req.params.kod;
-
-  // kitap.json dosyasını oku
-  fs.readFile("kitap.json", "utf8", (err, data) => {
-    if (err) {
-      console.error("Dosya Okuma Hatası:", err);
-      res.status(500).json({ error: "Internal Server Error" });
-      return;
-    }
-
-    try {
-      // JSON formatındaki veriyi JavaScript nesnesine çevir
-      const kitapData = JSON.parse(data);
-
-      // Kod ile eşleşen kitap var mı kontrol et
-      const hedefKitap = kitapData.find((kitap) => kitap.kod === kod);
-
-      if (hedefKitap) {
-        // Eğer kod ile eşleşen kitap varsa, bilgileri gönder
-        res.json({
-          kod: hedefKitap.kod,
-          kitapYazisi: hedefKitap.kitapYazisi,
-        });
-      } else {
-        res.status(404).json({ error: "Kitap bulunamadı" });
-      }
-    } catch (parseError) {
-      console.error("JSON Parse Hatası:", parseError);
-      res.status(500).json({ error: "Internal Server Error" });
-    }
-  });
-});
-
-app.get("/paylas", (req, res) => {
-  if (req.session.kullaniciAdi) {
-    res.render("paylas", {
-      kullaniciAdi: req.session.kullaniciAdi,
-      duyurular: duyurular,
-    });
-  } else {
-    res.redirect("/giris");
-  }
-});
-app.get("/oku", (req, res) => {
-  res.render("oku");
-});
-// Kayıt sayfası
-app.get("/kayit", (req, res) => {
-  res.render("kayit");
-});
-app.get("/duyuru", (req, res) => {
-  res.render("duyuru", { duyurular: duyurular });
-});
-app.get("/chat", (req, res) => {
-  res.render("chat");
 });
 app.get("/adminpanel", (req, res) => {
   // Oturum açılmış mı kontrolü
@@ -166,7 +155,135 @@ app.get("/adminpanel", (req, res) => {
     res.redirect("/giris");
   }
 });
+// Kullanıcıları içeren JSON dosyasının yolu
+const hesapDosyaYolu = "hesap.json";
 
+// Kullanıcıları getiren endpoint
+app.get("/kullanicilar", (req, res) => {
+  const hesapVerileri = JSON.parse(fs.readFileSync(hesapDosyaYolu, "utf8"));
+  res.json(hesapVerileri.kullanicilar);
+});
+
+// Kullanıcıları silecek endpoint (deleteUser)
+app.post("/deleteUser", (req, res) => {
+  const kullaniciAdi = req.body.kullaniciAdi;
+
+  // Kullanıcıları içeren JSON dosyasını oku
+  const hesapVerileri = JSON.parse(fs.readFileSync(hesapDosyaYolu, "utf8"));
+
+  // Kullanıcıyı sil
+  hesapVerileri.kullanicilar = hesapVerileri.kullanicilar.filter(
+    (user) => user.kullaniciAdi !== kullaniciAdi,
+  );
+
+  // Güncellenmiş verileri JSON dosyasına yaz
+  fs.writeFileSync(hesapDosyaYolu, JSON.stringify(hesapVerileri, null, 2));
+
+  res.send(`Kullanıcı "${kullaniciAdi}" başarıyla silindi.`);
+});
+app.post("/deleteKitap", (req, res) => {
+  const { kitapAdi } = req.body;
+
+  const rawKitapData = fs.readFileSync("kitap.json");
+  let kitaplar = JSON.parse(rawKitapData);
+
+  // Kitabı silme
+  let kitapIndex = -1;
+  for (let i = 0; i < kitaplar.length; i++) {
+    if (kitaplar[i].kitapAdi.toLowerCase() === kitapAdi.toLowerCase()) {
+      // Silinecek kitabın index'ini kaydet
+      kitapIndex = i;
+      break;
+    }
+  }
+
+  // Kitap bulunduysa sil ve güncellenmiş kitap listesini dosyaya kaydet
+  if (kitapIndex !== -1) {
+    kitaplar.splice(kitapIndex, 1);
+
+    fs.writeFile("kitap.json", JSON.stringify(kitaplar), (err) => {
+      if (err) {
+        console.error("Kitap silme hatası:", err);
+        res.status(500).json({ message: "Internal Server Error" });
+        return;
+      }
+
+      res.status(200).json({ message: "Kitap başarıyla silindi." });
+    });
+  } else {
+    res
+      .status(404)
+      .json({ message: "Belirtilen isme sahip kitap bulunamadı." });
+  }
+});
+
+function hesaplariGetir() {
+  const hesaplarJSON = fs.readFileSync("hesap.json");
+  return JSON.parse(hesaplarJSON);
+}
+setInterval(() => {
+  const yeniHesapJson = fs.readFileSync("hesap.json");
+  const kullanicilar = JSON.parse(yeniHesapJson).kullanicilar;
+
+  // Yeni kullanıcıları kontrol et ve gerekli işlemleri gerçekleştir
+}, 1000); // Örneğin, her saniye kontrol et
+
+// Kullanıcıya ait rolü adı getirme fonksiyonu
+const rolAdiGetir = (perm) => {
+  switch (perm) {
+    case 1:
+      return "Kurucu";
+    case 2:
+      return "Yapay zeka (Aİ)";
+    case 3:
+      return "Moderatör";
+    default:
+      return "Yazar";
+  }
+};
+
+// Kullanıcı profil sayfasını gösteren endpoint
+app.get("/profil/:kullaniciAdi", (req, res) => {
+  const kullaniciAdi = req.params.kullaniciAdi;
+  const yeniHesapJson = fs.readFileSync("hesap.json");
+  const kullanicilar = JSON.parse(yeniHesapJson).kullanicilar;
+
+  const kullanici = kullanicilar.find((k) => k.kullaniciAdi === kullaniciAdi);
+
+  if (!kullanici) {
+    res.status(404).send("Kullanıcı bulunamadı");
+    return;
+  }
+
+  res.render("profil.ejs", { kullanici, rolAdiGetir });
+});
+
+app.get("/yaz", (req, res) => {
+  res.render("yaz");
+});
+app.get("/paylas", (req, res) => {
+  if (req.session.kullaniciAdi) {
+    res.render("paylas", {
+      kullaniciAdi: req.session.kullaniciAdi,
+      duyurular: duyurular,
+    });
+  } else {
+    res.redirect("/giris");
+  }
+});
+app.get("/oku", (req, res) => {
+  res.render("oku");
+});
+// Kayıt sayfası
+app.get("/kayit", (req, res) => {
+  res.render("kayit");
+});
+app.get("/duyuru", (req, res) => {
+  res.render("duyuru", { duyurular: duyurular });
+});
+app.get("/chat", (req, res) => {
+  res.render("chat");
+});
 app.get("/result", (req, res) => {
   res.render("result");
 });
@@ -233,26 +350,6 @@ app.post("/yorum-ekle", (req, res) => {
   res.redirect(`/kitap/${kitapAdi}`);
 });
 
-function kullaniciRoluGetir(kullaniciAdi) {
-  const kullanici = hesaplar.kullanicilar.find(
-    (k) => k.kullaniciAdi === kullaniciAdi,
-  );
-  return kullanici ? kullanici.perm : 0;
-}
-
-/*/
-app.post("/yorum-ekle", (req, res) => {
-  const kitapAdi = req.body.kitapAdi;
-  const isim = req.body.isim;
-  const yorum = req.body.yorum;
-
-  // Yorumları dosyaya kaydet
-  kaydetYoruma(kitapAdi, isim, yorum);
-
-  // Sayfayı yeniden yükle
-  res.redirect(`/kitap/${kitapAdi}`);
-});
-/*/
 // Panel sayfası
 app.get("/panel", (req, res) => {
   if (req.session.kullaniciAdi) {
@@ -318,8 +415,8 @@ app.post("/kayit", (req, res) => {
   );
 
   if (!kullaniciVarMi) {
-    // "perm" özelliğini ekleyerek her zaman 0 olarak ayarla
-    const yeniKullanici = { kullaniciAdi, sifre, perm: 0 };
+    // Kullanıcı objesini oluştururken "perm" alanını ekleyin
+    const yeniKullanici = { kullaniciAdi, sifre, perm: "0" };
 
     hesaplar.kullanicilar.push(yeniKullanici);
 
@@ -366,11 +463,6 @@ app.post("/cikis", (req, res) => {
 });
 
 // Kitap ekleme işlemi
-function generateRandomCode() {
-  return Math.floor(1000 + Math.random() * 9000);
-}
-// HTML sayfasını render etmek için bir route
-
 app.post("/kitap-ekle", (req, res) => {
   const {
     kitapAdi,
@@ -381,9 +473,6 @@ app.post("/kitap-ekle", (req, res) => {
     kitapFoto,
   } = req.body;
 
-  // Rastgele 4 haneli kod oluştur
-  const rastgeleKod = generateRandomCode();
-
   const yeniKitap = {
     kitapAdi,
     kitapYazari,
@@ -391,122 +480,30 @@ app.post("/kitap-ekle", (req, res) => {
     kitapKonusu,
     kitapYazisi,
     kitapFoto,
-    kod: rastgeleKod, // Oluşturulan kodu ekle
   };
 
-  // Kitapları dosyaya yazmadan önce eklenen kitabın bilgilerini sakla
-  const eklenenKitapInfo = {
-    kitapAdi,
-    kitapYazari,
-    kitapAciklamasi,
-    kitapKonusu,
-    kitapYazisi,
-    kitapFoto,
-    kod: rastgeleKod,
-  };
+  kitaplar.push(yeniKitap);
 
-  // Dosyaya yaz
-  const dosyaYolu = "kitap.json";
-  let mevcutKitaplar = [];
+  // Kitapları dosyaya yaz
+  fs.writeFile(
+    kitapDosya,
+    kitaplar.map((k) => JSON.stringify(k)).join("\n"),
+    (err) => {
+      if (err) throw err;
+      console.log("Yeni kitap dosyaya yazıldı.");
+    },
+  );
 
-  // Önce dosyadan mevcut kitapları oku (eğer varsa)
-  try {
-    const dosyaIcerigi = fs.readFileSync(dosyaYolu, "utf-8");
-    mevcutKitaplar = JSON.parse(dosyaIcerigi);
-  } catch (hata) {
-    console.error("Dosya okuma hatası:", hata);
-    // Dosya okuma hatası olursa isteği başarısız olarak işaretle
-    return res.status(500).json({ error: "Dosya okuma hatası" });
-  }
-
-  // Yeni kitabı ekleyerek tüm kitapları güncelle
-  mevcutKitaplar.push(eklenenKitapInfo);
-
-  // Güncellenmiş kitap listesini dosyaya yaz
-  try {
-    fs.writeFileSync(dosyaYolu, JSON.stringify(mevcutKitaplar, null, 2));
-    // Başarılı bir şekilde eklendiğine dair bilgiyi kullanıcıya gönder
-    res.status(200).json({ success: "Kitap başarıyla eklendi" });
-  } catch (hata) {
-    console.error("Dosya yazma hatası:", hata);
-    // Dosya yazma hatası olursa isteği başarısız olarak işaretle
-    res.status(500).json({ error: "Dosya yazma hatası" });
-  }
+  res.redirect("/kitaplar");
 });
-
-// ...
-
-app.post("/applyChanges", (req, res) => {
-  const kod = req.body.kod;
-  const yeniKitapYazisi = req.body.kitapYazisi;
-
-  fs.readFile("kitap.json", "utf8", (err, data) => {
-    if (err) {
-      console.error("Dosya Okuma Hatası:", err);
-      res.status(500).json({ error: "Internal Server Error" });
-      return;
-    }
-
-    try {
-      let kitapData = JSON.parse(data);
-
-      // Log mesajları ekleyin
-      console.log("Gelen Kod:", kod);
-      console.log("kitapData:", kitapData);
-
-      // Kod ile eşleşen kitap varsa, sadece kitapYazisi'ni güncelle
-      const hedefKitapIndex = kitapData.findIndex((kitap) => kitap.kod === kod);
-
-      if (hedefKitapIndex !== -1) {
-        kitapData[hedefKitapIndex].kitapYazisi = yeniKitapYazisi;
-
-        fs.writeFile(
-          "kitap.json",
-          JSON.stringify(kitapData, null, 2),
-          "utf8",
-          (err) => {
-            if (err) {
-              console.error("Dosya Yazma Hatası:", err);
-              res.status(500).json({ error: "Internal Server Error" });
-              return;
-            }
-
-            console.log("Güncellenmiş kitapData:", kitapData);
-
-            // res.json'ı res.render'dan önce çağır
-            res.json({
-              kod,
-              kitapYazisi: kitapData[hedefKitapIndex].kitapYazisi,
-            });
-
-            const kitapInfo = {
-              kod: kod,
-              kitapYazisi: yeniKitapYazisi,
-            };
-
-            // res.render'ı res.json'dan sonra çağır
-            res.render("applyChanges.ejs", { kitapInfo });
-          },
-        );
-      } else {
-        res
-          .status(404)
-          .json({ error: "Kitap başarılı bir şekilde yazdırıldı." });
-      }
-    } catch (parseError) {
-      console.error("JSON Parse Hatası:", parseError);
-      res.status(500).json({ error: "Internal Server Error" });
-    }
-  });
-});
-
-// ...
 
 // Kitaplar sayfası
+const rawdata = fs.readFileSync("kitap.json");
+const kitaplar = JSON.parse(rawdata);
+
 app.get("/kitaplar", (req, res) => {
   res.render("kitaplar", { kitaplar });
 });
-
 app.get("/kitap/:kitapAdi", (req, res) => {
   const kitapAdi = req.params.kitapAdi;
   const kitap = kitaplar.find((k) => k.kitapAdi === kitapAdi);
@@ -625,146 +622,29 @@ app.post("/generate", async (req, res) => {
   }
 });
 
-function hesaplariGetir() {
-  const hesaplarJSON = fs.readFileSync("hesap.json");
-  return JSON.parse(hesaplarJSON);
-}
+app.post("/yorum-ekle", (req, res) => {
+  // Kullanıcı adını session'dan al
+  const kullaniciAdi = req.session.kullaniciAdi;
 
-app.post("/deleteUser", async (req, res) => {
-  try {
-    const { kullaniciAdi, sifre } = req.body;
+  const kitapAdi = req.body.kitapAdi;
+  const yorumMetni = req.body.yorum;
 
-    // Kullanıcıları dosyadan oku
-    const rawUserData = await fs.readFile("hesap.json", "utf8");
-    let users = JSON.parse(rawUserData).kullanicilar;
+  // Yeni yorum objesi
+  const yeniYorum = { kitapAdi, isim: kullaniciAdi, yorum: yorumMetni };
 
-    // Belirtilen kullanıcıyı bul
-    const userIndex = users.findIndex(
-      (user) => user.kullaniciAdi === kullaniciAdi && user.sifre === sifre,
-    );
+  // Yorumları dosyadan al
+  const yorumlar = yorumlariGetir();
 
-    // Kullanıcı bulunduysa sil
-    if (userIndex !== -1) {
-      users.splice(userIndex, 1);
+  // Yeni yorumu ekle
+  yorumlar.push(yeniYorum);
 
-      // Güncellenmiş kullanıcı listesini dosyaya kaydet
-      await fs.writeFile("hesap.json", JSON.stringify({ kullanicilar: users }));
+  // Yorumları dosyaya kaydet
+  yorumlariKaydet(yorumlar);
 
-      res.status(200).json({ message: "Kullanıcı başarıyla silindi." });
-    } else {
-      res.status(404).json({ message: "Kullanıcı bulunamadı." });
-    }
-  } catch (err) {
-    console.error("Kullanıcı silme hatası:", err);
-    res.status(500).json({ message: "Internal Server Error" });
-  }
-});
-
-app.post("/deleteKitap", (req, res) => {
-  const { kitapAdi } = req.body;
-
-  const rawKitapData = fs.readFileSync("kitap.json");
-  let kitaplar = JSON.parse(rawKitapData);
-
-  // Kitabı silme
-  let kitapIndex = -1;
-  for (let i = 0; i < kitaplar.length; i++) {
-    if (kitaplar[i].kitapAdi.toLowerCase() === kitapAdi.toLowerCase()) {
-      // Silinecek kitabın index'ini kaydet
-      kitapIndex = i;
-      break;
-    }
-  }
-
-  // Kitap bulunduysa sil ve güncellenmiş kitap listesini dosyaya kaydet
-  if (kitapIndex !== -1) {
-    kitaplar.splice(kitapIndex, 1);
-
-    fs.writeFile("kitap.json", JSON.stringify(kitaplar), (err) => {
-      if (err) {
-        console.error("Kitap silme hatası:", err);
-        res.status(500).json({ message: "Internal Server Error" });
-        return;
-      }
-
-      res.status(200).json({ message: "Kitap başarıyla silindi." });
-    });
-  } else {
-    res
-      .status(404)
-      .json({ message: "Belirtilen isme sahip kitap bulunamadı." });
-  }
+  res.redirect("/kitap/" + kitapAdi); // Yorum eklendikten sonra kitap detay sayfasına yönlendir
 });
 
 // Sunucu dinleme
 app.listen(port, () => {
   console.log(`Server listening at http://localhost:${port}`);
-});
-
-const hesapJson = fs.readFileSync("hesap.json");
-const kullanicilar = JSON.parse(hesapJson).kullanicilar;
-
-// Kullanıcıya ait rolü adı getirme fonksiyonu
-const rolAdiGetir = (perm) => {
-  switch (perm) {
-    case 1:
-      return "Kurucu";
-    case 2:
-      return "Yapay zeka (Aİ)";
-    case 3:
-      return "Moderatör";
-    default:
-      return "Yazar";
-  }
-};
-
-// Kullanıcı profil sayfasını gösteren endpoint
-app.get("/profil/:kullaniciAdi", (req, res) => {
-  const kullaniciAdi = req.params.kullaniciAdi;
-  const kullanici = kullanicilar.find((k) => k.kullaniciAdi === kullaniciAdi);
-
-  if (!kullanici) {
-    res.status(404).send("Kullanıcı bulunamadı");
-    return;
-  }
-
-  res.render("profil.ejs", { kullanici, rolAdiGetir });
-});
-const socketIo = require('socket.io');
-const { createServer } = require('http'); // Doğru
-const server = createServer(app);
-
-const io = socketIo(server);
-const users = new Set(); // Online kullanıcılar
-const messages = []; // Gönderilen mesajlar
-app.get('/sohbet', (req, res) => {
-    res.render('sohbet');
-});
-
-io.on('connection', (socket) => {
-    let username;
-
-    // Kullanıcı adını al ve online kullanıcılara ekle
-    socket.on('addUser', (name) => {
-        username = name;
-        users.add(username);
-        io.emit('userList', Array.from(users));
-        io.emit('messageList', messages);
-    });
-
-    // Mesaj gönderme
-    socket.on('sendMessage', (message) => {
-        const formattedMessage = `${username}: ${message}`;
-        messages.push(formattedMessage);
-        if (messages.length > 10) {
-            messages.shift(); // Sadece son 10 mesajı sakla
-        }
-        io.emit('messageList', messages);
-    });
-
-    // Bağlantı koptuğunda kullanıcıyı listeden çıkar
-    socket.on('disconnect', () => {
-        users.delete(username);
-        io.emit('userList', Array.from(users));
-    });
 });
