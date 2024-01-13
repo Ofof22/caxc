@@ -62,21 +62,27 @@
                     <div>
                         <h2>Üyeler</h2>
                         <ul>
-                          <% for (const user of users) { %>
-                            <li>
-                              <%= user.kullaniciAdi %> - <%= user.sifre %>
-                              <form action="/deleteUser" method="POST">
-                                <!-- Kullanıcı adı ve şifreyi ayrı ayrı gönder -->
-                                <input type="hidden" name="kullaniciAdi" value="<%= user.kullaniciAdi %>">
-                                <input type="hidden" name="sifre" value="<%= user.sifre %>">
-                                <button type="submit">🗑️</button>
-                              </form>
-                            </li>
-                          <% } %>
+                            <% for (const user of users) { %>
+                                <li>
+                                    <%= user.kullaniciAdi %> - <%= user.sifre %> - İzin Seviyesi: <%= user.perm %>
+                                    <form action="/manageUser" method="POST">
+                                        <input type="hidden" name="kullaniciAdi" value="<%= user.kullaniciAdi %>">
+
+                                        <!-- Güncelleme işlemi -->
+                                        <label for="permission">Yeni İzin Seviyesi (0-3): </label>
+                                        <input type="number" name="permission" min="0" max="3">
+
+                                        <!-- Silme işlemi -->
+                                        <button type="submit" name="action" value="delete">Sil</button>
+
+                                        <!-- Güncelleme işlemi için buton -->
+                                        <button type="submit" name="action" value="update">Güncelle</button>
+                                    </form>
+                                </li>
+                            <% } %>
                         </ul>
-
-
                     </div>
+
                     <div>
                         <h2>Kitaplar</h2>
                         <ul>
